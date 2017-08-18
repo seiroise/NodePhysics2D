@@ -21,71 +21,50 @@ namespace NodePhysics2D {
 		/// <param name="delta">Delta.</param>
 		public override void Update(float delta) {
 			_delta = delta;
-			UpdateGravity();
-			if (sim.settings.updateSpring) {
-				UpdateSpring();
-			}
-			if (sim.settings.updateString) {
-				UpdateString();
-			}
-			if (sim.settings.useDamping) {
-				UpdateDamping();
+			ApplyLinkConstraint();
+			ApplyHingeConstraint();
+			UpdateNode();
+		}
+
+		/// <summary>
+		/// リンクの制約を適用
+		/// </summary>
+		private void ApplyLinkConstraint() {
+			Link2D l;
+			for (int i = 0; i < sim.NumberOfLinks(); ++i) {
+				l = sim.GetLink(i);
+				l.Update();
 			}
 		}
 
 		/// <summary>
-		/// 重力による座標の更新
+		/// ヒンジの制約のの適用
 		/// </summary>
-		private void UpdateGravity() {
-			Vector2 g = sim.settings.gravity * sim.settings.gravityScale * _delta;
-			Node2D n;
+		private void ApplyHingeConstraint() {
+			Hinge2D h;
+			for (int i = 0; i < sim.NumberOfHinges(); ++i) {
+				h = sim.GetHinge(i);
+				h.Update();
+			}
+		}
+
+		/// <summary>
+		/// ノードの更新
+		/// </summary>
+		private void UpdateNode() {
+			//重力
+			Vector2 g = sim.settings.gravity * sim.settings.gravityScale;
 			for (int i = 0; i < sim.NumberOfNodes(); ++i) {
-				n = sim.GetNode(i);
+				Node2D n = sim.GetNode(i);
 				if (n.isFree) {
-					n.point += g;
-				}
-			}
-		}
-
-		/// <summary>
-		/// バネ制約の更新
-		/// </summary>
-		private void UpdateSpring() {
-			Spring2D s;
-			for (int i = 0; i < sim.NumberOfSprings(); ++i) {
-				s = sim.GetSpring(i);
-				if (s.enable) {
-					s.Update(_delta);
-				}
-			}
-		}
-
-		/// <summary>
-		/// ヒモ制約の更新
-		/// </summary>
-		private void UpdateString() {
-			String2D s;
-			for (int i = 0; i < sim.NumberOfStrings(); ++i) {
-				s = sim.GetString(i);
-				if (s.enable) {
-					s.Update(_delta);
-				}
-			}
-		}
-
-		/// <summary>
-		/// 減衰による座標の更新
-		/// </summary>
-		private void UpdateDamping() {
-			Node2D n;
-			Vector2 temp;
-			float damping = sim.settings.dampingRatio;
-			for (int i = 0; i < sim.NumberOfNodes(); ++i) {
-				n = sim.GetNode(i);
-				if (n.isFree) {
-					temp = n.point;
-					n.point += (n.point - n.prevPoint) * damping;
-					n.prevPoint = temp;
+					// 重力の適応
+					n.AddResultant(g.x, g.y);
+					// 減衰の適応
+					n.ApplyDamping();
+					// 時間倍率の適用
+					n.ScaleResultant(_delta);
+					// 座標の更新
+					n.ApplyResultant();
 				}
 			}
 		}

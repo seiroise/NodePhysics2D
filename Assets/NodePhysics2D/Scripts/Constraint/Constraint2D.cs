@@ -26,6 +26,7 @@ namespace NodePhysics2D {
 		/// <summary>
 		/// シミュレータ
 		/// </summary>
+		[System.NonSerialized]
 		protected PhysicsSim _sim;
 
 		public PhysicsSim sim {
@@ -41,7 +42,7 @@ namespace NodePhysics2D {
 		/// <summary>
 		/// 更新
 		/// </summary>
-		public abstract void Update(float deltaTime);
+		public abstract void Update();
 	}
 
 }
