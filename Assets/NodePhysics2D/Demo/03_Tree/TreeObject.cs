@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NodePhysics2D.Core;
 
 namespace NodePhysics2D.Demo {
 
@@ -56,6 +57,10 @@ namespace NodePhysics2D.Demo {
 
 			Hinge2D h = _sim.MakeHinge(l, r, link.b);
 			h.constraint = new SpringHinge2D(_sim, h, _power);
+			Hinge2D hl = _sim.MakeHinge(link.a, l, link.b);
+			hl.constraint = new SpringHinge2D(_sim, hl, _power);
+			Hinge2D hr = _sim.MakeHinge(link.a, r, link.b);
+			hl.constraint = new SpringHinge2D(_sim, hr, _power);
 
 			MakeBranch(_sim.MakeLink(link.b, r), depth - 1);
 			MakeBranch(_sim.MakeLink(link.b, l), depth - 1);

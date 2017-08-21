@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NodePhysics2D.Core;
 
 namespace NodePhysics2D.Demo {
 
